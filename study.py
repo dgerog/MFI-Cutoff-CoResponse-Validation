@@ -53,6 +53,6 @@ for i in range(0, len(STORAGE_DIR)):
     study.readTable(FILE_INPUT[i], COLS_TO_USE[i], LINES_TO_SKIP[i], True, LABELS_ID_COL, CONTROL_ID_COL, _cleanCharacters=REMOVE_CHARACTERS)
     
     # Co-Response Validation
-    score = study.coResponsesValidation(_ColBasis=1, _ColControl=[9], _allInd=None)
+    score = study.coResponsesValidation(_ColBasis=1, _ColControl=[15,28,34], _allInd=None)
 
     print('%s: %.2d%%' % (FILE_INPUT[i], 100*score))

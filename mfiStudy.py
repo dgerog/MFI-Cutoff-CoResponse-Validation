@@ -47,6 +47,8 @@ class mfiStudy:
         p[p < .000000000000001] = .000000000000001
         p1 = np.array(np.divide(p, np.sum(p)))
 
+
+        print(p1)
         avgP = p1
 
         # test fit
@@ -60,11 +62,14 @@ class mfiStudy:
 
         # compute average
         avgP = avgP/(1+_model2.shape[0])
-
+    
+        print(avgP)
         gJS = np.sum(p1*np.log(np.divide(p1,avgP)))
         for i in range(0,_model2.shape[0]):
             gJS = gJS + np.sum(p2*np.log(np.divide(p2[i,:],avgP)))
         gJS = gJS/(1+_model2.shape[0])
+
+        print(gJS)
 
         return (math.exp(-gJS))
     
@@ -103,7 +108,7 @@ class mfiStudy:
             self.X = pd.read_excel (_path, usecols=_colsToRead, skiprows=_linesToSkip).values
 
         # Normalize
-        self.X = np.transpose(preprocessing.normalize(np.transpose(self.X), norm='l2'))
+        self.X = preprocessing.normalize(self.X, norm='l2')
 
         # Read the data headers (if any)
         if (_headersRow):
@@ -154,7 +159,7 @@ class mfiStudy:
             _trainPct = .9 # default is 10-fold cross validation
         
         if _allInd is None:
-            _allInd = list(range(0,self.X.shape[1]))
+            _allInd = list(range(0,self.X.shape[0]))
         random.shuffle(_allInd)
 
         breakInd = math.floor(_trainPct*len(_allInd))
@@ -186,13 +191,13 @@ class mfiStudy:
             _allInd = list(range(0,self.X.shape[1]))
 
         # fit on observation data
-        fitBasis = stats.invgauss.fit(self.X[_ColBasis, _allInd])
+        fitBasis = stats.invgauss.fit(self.X[_allInd, _ColBasis])
 
         # fit on test data
         fitTest = np.zeros((len(_ColControl),3))
         for i in range(0, len(_ColControl)):
             # fit on test data
-            (mu, loc, scale) = stats.invgauss.fit(self.X[_ColControl[i], _allInd])
+            (mu, loc, scale) = stats.invgauss.fit(self.X[_allInd, _ColControl[i]])
             fitTest[i:,] = [mu, loc, scale]
         
         # hyphothesis testing
