@@ -1,6 +1,3 @@
-from itertools import permutations
-import math
-
 from mfiStudy import *
 
 # in file
@@ -43,6 +40,14 @@ CONTROL_ID_COL = None
 # characters to remove from header title
 REMOVE_CHARACTERS = [";", ".", "-", ","]
 
+#
+# Co-responses groups
+#
+coresp = [{
+    "basis": 1,
+    "control": list(range(0,40))
+}]
+
 # 
 # Start parsing data 
 #
@@ -53,6 +58,10 @@ for i in range(0, len(STORAGE_DIR)):
     study.readTable(FILE_INPUT[i], COLS_TO_USE[i], LINES_TO_SKIP[i], True, LABELS_ID_COL, CONTROL_ID_COL, _cleanCharacters=REMOVE_CHARACTERS)
     
     # Co-Response Validation
-    score = study.coResponsesValidation(_ColBasis=1, _ColControl=[15,28,34], _allInd=None)
+    for item in coresp:
+        for k in range(0,len(item['control'])):
+            score = study.coResponsesValidation(_ColBasis=item['basis'], _ColControl=[item['control'][k]], _allInd=None)
+            print('%s [%d - %d]: %.5f%%' % (FILE_INPUT[i], item['basis'], item['control'][k], 100*score))
 
-    print('%s: %.2d%%' % (FILE_INPUT[i], 100*score))
+        #score = study.coResponsesValidation(_ColBasis=item['basis'], _ColControl=item['control'], _allInd=None)
+        #print('%s [%d]: %.2f' % (FILE_INPUT[i], item['basis'], score))

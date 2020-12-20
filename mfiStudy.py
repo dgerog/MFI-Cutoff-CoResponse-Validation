@@ -4,6 +4,9 @@ import random
 import math
 from scipy import stats
 
+import matplotlib.pyplot as plt
+
+
 from sklearn import preprocessing
 
 class mfiStudy:
@@ -38,40 +41,33 @@ class mfiStudy:
             RETURN: The divergence score [0,1]
         """
         
-        POINT_DENSITY = 10 # how many points to fit
-
-        x = np.divide(list(range(0,(POINT_DENSITY + 1))), POINT_DENSITY-1)
+        POINT_DENSITY = 1000 # how many points to fit
         
         # basis fit
-        p = stats.invgauss(mu=_model1[0], loc=_model1[1], scale=_model1[2]).pdf(x)
-        p[p < .000000000000001] = .000000000000001
-        p1 = np.array(np.divide(p, np.sum(p)))
-
-
-        print(p1)
+        model = stats.invgauss(mu=_model1[0], loc=_model1[1], scale=_model1[2])
+        x = np.linspace(model.ppf(0.010), model.ppf(0.999), POINT_DENSITY)
+        p1 = model.pdf(x)
+        
         avgP = p1
 
         # test fit
-        p2 = np.zeros((_model2.shape[0],POINT_DENSITY+1))
+        p2 = np.zeros((_model2.shape[0], POINT_DENSITY))
         for i in range(0,_model2.shape[0]):
-            p = stats.invgauss(mu=_model2[i,0], loc=_model2[i,1], scale=_model2[i,2]).pdf(x)
-            p[p < .000000000000001] = .000000000000001
-            p2[i,:] = np.array(np.divide(p, np.sum(p)))
-
+            model = stats.invgauss(mu=_model2[i,0], loc=_model2[i,1], scale=_model2[i,2])
+            x = np.linspace(model.ppf(0.001), model.ppf(0.999), POINT_DENSITY)
+            p2[i,:] = model.pdf(x)
+            
             avgP = avgP + p2[i,:]
 
         # compute average
-        avgP = avgP/(1+_model2.shape[0])
+        avgP = avgP/(1 + _model2.shape[0])
     
-        print(avgP)
         gJS = np.sum(p1*np.log(np.divide(p1,avgP)))
         for i in range(0,_model2.shape[0]):
             gJS = gJS + np.sum(p2*np.log(np.divide(p2[i,:],avgP)))
         gJS = gJS/(1+_model2.shape[0])
 
-        print(gJS)
-
-        return (math.exp(-gJS))
+        return (math.exp(-gJS/1000))
     
     #
     # Public
